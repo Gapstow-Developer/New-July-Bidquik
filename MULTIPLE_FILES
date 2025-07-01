@@ -1,0 +1,41 @@
+\`\`\`ts
+// app/api/send-email-simple/route.ts
+import { getSettings } from "@/lib/get-settings"
+
+/** rest of code here **/
+
+// app/api/test-email-delivery/route.ts
+import { getSettings } from "@/lib/get-settings"
+
+/** rest of code here **/
+
+// app/api/twilio-sms/route.ts
+import { getSettings } from "@/lib/get-settings"
+
+/** rest of code here **/
+
+// app/api/upload-logo/route.ts
+import { getSettings } from "@/lib/get-settings"
+
+/** rest of code here **/
+
+// app/api/delete-logo/route.ts
+import { getSettings } from "@/lib/get-settings"
+
+/** rest of code here **/
+
+// app/api/send-followup-email/route.ts
+import { getSettings } from "@/lib/get-settings"
+
+/** rest of code here **/
+
+// app/api/submit-commercial-inquiry/route.ts
+import { getSettings } from "@/lib/get-settings"
+
+/** rest of code here **/
+
+// app/api/send-email/route.ts
+import { getSettings } from "@/lib/get-settings"
+
+/** rest of code here **/
+\`\`\`
