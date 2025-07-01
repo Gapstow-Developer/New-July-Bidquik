@@ -13,11 +13,13 @@ import { DiscountSettingsForm } from "@/components/dashboard/settings/discount-s
 import { EmailTemplatesForm } from "@/components/dashboard/settings/email-templates-form"
 import { ApiKeysSettingsForm } from "@/components/dashboard/settings/api-keys-settings-form"
 import { ServiceAreaSettingsForm } from "@/components/dashboard/settings/service-area-settings-form"
+import { headers } from "next/headers" // Add this import
 
 // Force dynamic rendering
 export const dynamic = "force-dynamic"
 
 export default function SettingsPage() {
+  headers() // Add this line to force dynamic rendering
   const [settings, setSettings] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -35,7 +37,7 @@ export default function SettingsPage() {
         headers: {
           "Cache-Control": "no-cache, no-store, must-revalidate",
           Pragma: "no-cache",
-          Expires: "0",
+          Expires: "0", // Corrected the syntax here
         },
       })
 
@@ -77,7 +79,7 @@ export default function SettingsPage() {
           <h2 className="text-3xl font-bold tracking-tight">Settings</h2>
           <p className="text-muted-foreground">Configure your business settings and form appearance</p>
         </div>
-        <Button onClick={previewForm} variant="outline" className="flex items-center gap-2">
+        <Button onClick={previewForm} variant="outline" className="flex items-center gap-2 bg-transparent">
           <Eye className="h-4 w-4" />
           Preview Form
         </Button>
