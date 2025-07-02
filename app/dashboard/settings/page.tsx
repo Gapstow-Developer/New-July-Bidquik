@@ -13,13 +13,11 @@ import { DiscountSettingsForm } from "@/components/dashboard/settings/discount-s
 import { EmailTemplatesForm } from "@/components/dashboard/settings/email-templates-form"
 import { ApiKeysSettingsForm } from "@/components/dashboard/settings/api-keys-settings-form"
 import { ServiceAreaSettingsForm } from "@/components/dashboard/settings/service-area-settings-form"
-import { headers } from "next/headers" // Add this import
 
 // Force dynamic rendering
 export const dynamic = "force-dynamic"
 
 export default function SettingsPage() {
-  headers() // Add this line to force dynamic rendering
   const [settings, setSettings] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -37,7 +35,7 @@ export default function SettingsPage() {
         headers: {
           "Cache-Control": "no-cache, no-store, must-revalidate",
           Pragma: "no-cache",
-          Expires: "0", // Corrected the syntax here
+          Expires: "0",
         },
       })
 
@@ -135,8 +133,6 @@ export default function SettingsPage() {
           ) : (
             <>
               <Card className="mb-6">
-                {" "}
-                {/* Added Card wrapper for PricingSettingsForm */}
                 <CardHeader>
                   <CardTitle>Story & Markup Pricing</CardTitle>
                   <CardDescription>
@@ -147,8 +143,6 @@ export default function SettingsPage() {
               </Card>
 
               <Card>
-                {" "}
-                {/* Added Card wrapper for ServicesTable */}
                 <CardHeader>
                   <CardTitle>Window Cleaning Services</CardTitle>
                   <CardDescription>Manage individual window cleaning services and their pricing.</CardDescription>
@@ -243,7 +237,7 @@ export default function SettingsPage() {
           ) : (
             <>
               <ServiceAreaSettingsForm />
-              <ServicesTable /> {/* This will show ALL services */}
+              <ServicesTable />
             </>
           )}
         </TabsContent>

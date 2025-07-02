@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@auth/core": "latest",
+    "@clerk/nextjs": "latest",
     "@hookform/resolvers": "latest",
     "@prisma/client": "latest",
     "@radix-ui/react-accordion": "latest",

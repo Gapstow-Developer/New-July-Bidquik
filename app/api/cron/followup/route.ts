@@ -9,6 +9,8 @@ export async function GET() {
       process.env.NEXTAUTH_URL ||
       (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")
 
+    console.log(`Attempting to fetch from: ${baseUrl}/api/check-incomplete-quotes`)
+
     const response = await fetch(`${baseUrl}/api/check-incomplete-quotes`, {
       method: "POST",
       headers: {
@@ -16,9 +18,15 @@ export async function GET() {
       },
     })
 
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error(`❌ check-incomplete-quotes API call failed with status ${response.status}: ${errorText}`)
+      throw new Error(`Failed to check incomplete quotes: ${errorText}`)
+    }
+
     const result = await response.json()
 
-    console.log("🕐 Cron job result:", result)
+    console.log("✅ Cron job result:", result)
 
     return NextResponse.json({
       success: true,
