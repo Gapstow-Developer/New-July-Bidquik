@@ -1,18 +1,27 @@
--- First, let's check if we have any settings record and get its ID
-DO $$
-DECLARE
-    settings_id UUID;
-BEGIN
-    -- Try to get the first settings record ID
-    SELECT id INTO settings_id FROM settings LIMIT 1;
-    
-    IF settings_id IS NOT NULL THEN
-        -- Update existing record
-        UPDATE settings 
-        SET 
-            business_email_template = COALESCE(
-                NULLIF(business_email_template, ''),
-                'NEW WINDOW CLEANING QUOTE REQUEST
+-- First, let's check if the email_templates table exists. If not, create it.
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'email_templates') THEN
+        CREATE TABLE email_templates (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            template_name TEXT NOT NULL UNIQUE,
+            subject TEXT NOT NULL,
+            body TEXT NOT NULL,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+            updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        );
+    END IF;
+END $$;
+
+-- Now, let's ensure the default email templates are present.
+-- We'll use ON CONFLICT DO UPDATE to handle cases where they might already exist
+-- or if the script is run multiple times.
+
+-- Business Email Template
+INSERT INTO email_templates (template_name, subject, body)
+VALUES (
+    'business_quote_notification',
+    'NEW WINDOW CLEANING QUOTE REQUEST',
+    'NEW WINDOW CLEANING QUOTE REQUEST
 
 QUOTE AMOUNT: ${{finalPrice}}
 
@@ -37,10 +46,18 @@ Generated: {{timestamp}}
 ---
 This quote was generated automatically by your window cleaning calculator.
 Please contact the customer within 24 hours to schedule their service.'
-            ),
-            customer_email_template = COALESCE(
-                NULLIF(customer_email_template, ''),
-                'Dear {{customerName}},
+)
+ON CONFLICT (template_name) DO UPDATE SET
+    subject = EXCLUDED.subject,
+    body = EXCLUDED.body,
+    updated_at = NOW();
+
+-- Customer Email Template
+INSERT INTO email_templates (template_name, subject, body)
+VALUES (
+    'customer_quote_confirmation',
+    'Your Window Cleaning Quote from {{businessName}}',
+    'Dear {{customerName}},
 
 Thank you for requesting a quote from {{businessName}}!
 
@@ -62,69 +79,43 @@ Best regards,
 
 ---
 Quote generated on {{timestamp}}'
-            )
-        WHERE id = settings_id;
-    ELSE
-        -- Insert new record if none exists
-        INSERT INTO settings (
-            business_name,
-            business_email,
-            business_phone,
-            business_address,
-            business_email_template,
-            customer_email_template
-        ) VALUES (
-            'Your Window Cleaning Business',
-            'your-email@example.com',
-            '(555) 123-4567',
-            '123 Main St, Your City, ST 12345',
-            'NEW WINDOW CLEANING QUOTE REQUEST
+)
+ON CONFLICT (template_name) DO UPDATE SET
+    subject = EXCLUDED.subject,
+    body = EXCLUDED.body,
+    updated_at = NOW();
 
-QUOTE AMOUNT: ${{finalPrice}}
+-- Follow-up Email Template (from script 20)
+INSERT INTO email_templates (template_name, subject, body)
+VALUES (
+    'followup_email',
+    'Following Up On Your Quote from {{businessName}}',
+    'Dear {{customerName}},
 
-CUSTOMER INFORMATION:
-- Name: {{customerName}}
-- Email: {{customerEmail}}
-- Phone: {{customerPhone}}
-- Address: {{address}}
+We hope this email finds you well.
 
-PROPERTY DETAILS:
-- Square Footage: {{squareFootage}} sq ft
-- Number of Stories: {{stories}}
-- Service Type: {{serviceType}}
+We are following up on the quote we provided for your property at {{address}}. We wanted to ensure you received it and to see if you have any questions or would like to proceed with scheduling your service.
 
-SERVICES REQUESTED:
-{{services}}
-
-FINAL QUOTE: ${{finalPrice}}
-
-Generated: {{timestamp}}
-
----
-This quote was generated automatically by your window cleaning calculator.
-Please contact the customer within 24 hours to schedule their service.',
-            'Dear {{customerName}},
-
-Thank you for requesting a quote from {{businessName}}!
-
-YOUR QUOTE DETAILS:
+Your previous quote details:
 Property Address: {{address}}
 Square Footage: {{squareFootage}} sq ft
 Number of Stories: {{stories}}
 Service Type: {{serviceType}}
-
 Services Requested:
 {{services}}
-
 TOTAL QUOTE: ${{finalPrice}}
 
-We will contact you within 24 hours to schedule your service.
+Please feel free to reply to this email or call us at {{businessPhone}} to discuss your quote or schedule an appointment.
+
+We look forward to hearing from you!
 
 Best regards,
 {{businessName}}
 
 ---
 Quote generated on {{timestamp}}'
-        );
-    END IF;
-END $$;
+)
+ON CONFLICT (template_name) DO UPDATE SET
+    subject = EXCLUDED.subject,
+    body = EXCLUDED.body,
+    updated_at = NOW();

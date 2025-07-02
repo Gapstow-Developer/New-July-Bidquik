@@ -1,16 +1,34 @@
 -- Add organization_id to settings table
-ALTER TABLE settings ADD COLUMN IF NOT EXISTS organization_id TEXT;
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='settings' AND column_name='organization_id') THEN
+        ALTER TABLE settings ADD COLUMN organization_id TEXT;
+    END IF;
+END $$;
 
 -- Add organization_id to services table
-ALTER TABLE services ADD COLUMN IF NOT EXISTS organization_id TEXT;
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='services' AND column_name='organization_id') THEN
+        ALTER TABLE services ADD COLUMN organization_id TEXT;
+    END IF;
+END $$;
 
 -- Add organization_id to quotes table
-ALTER TABLE quotes ADD COLUMN IF NOT EXISTS organization_id TEXT;
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='quotes' AND column_name='organization_id') THEN
+        ALTER TABLE quotes ADD COLUMN organization_id TEXT;
+    END IF;
+END $$;
 
--- Create indexes for better performance
-CREATE INDEX IF NOT EXISTS idx_settings_organization_id ON settings(organization_id);
-CREATE INDEX IF NOT EXISTS idx_services_organization_id ON services(organization_id);
-CREATE INDEX IF NOT EXISTS idx_quotes_organization_id ON quotes(organization_id);
+-- Add organization_id to calculator_starts table
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='calculator_starts' AND column_name='organization_id') THEN
+        ALTER TABLE calculator_starts ADD COLUMN organization_id TEXT;
+    END IF;
+END $$;
 
--- Note: We are not using RLS policies at this stage to keep the initial setup simpler.
--- Data isolation will be handled at the application layer.
+-- Add organization_id to email_templates table
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='email_templates' AND column_name='organization_id') THEN
+        ALTER TABLE email_templates ADD COLUMN organization_id TEXT;
+    END IF;
+END $$;
